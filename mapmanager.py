@@ -1,3 +1,5 @@
+import pickle
+
 class Mapmanager():
     def __init__ (self):
         self.model = "block.egg"
@@ -31,36 +33,51 @@ class Mapmanager():
                 y += 1
             return x, y
         
-        def isEmpty(self, pos):
-            blocks = self.findBlocks(pos)
-            if blocks:
-                return False
-            else:
-                return True
+    def isEmpty(self, pos):
+        blocks = self.findBlocks(pos)
+        if blocks:
+            return False
+        else:
+            return True
 
-        def findBlocks(self, pos):
-            return self.land.findAllMatches("=at=" + str(pos))
+    def findBlocks(self, pos):
+        return self.land.findAllMatches("=at=" + str(pos))
 
-        def findHighestEmpty(self, pos):
-            x, y, z = pos
-            z = 1
-            while not self.isEmpty((x, y, z)):
-                z += 1
-            return (x, y, z)
+    def findHighestEmpty(self, pos):
+        x, y, z = pos
+        z = 1
+        while not self.isEmpty((x, y, z)):
+            z += 1
+        return (x, y, z)
         
-        def buildBlock(self, pos):
-            x, y, z = pos
-            new = findHighestEmpty(pos)
-            if new[2] <= z + 1:
-                self.addBlock(new)
+    def buildBlock(self, pos):
+        x, y, z = pos
+        new = findHighestEmpty(pos)
+        if new[2] <= z + 1:
+            self.addBlock(new)
         
-        def delBlock(self, position):
-            blocks = self.findBlocks(position)
+    def delBlock(self, position):
+        blocks = self.findBlocks(position)
+        for block in blocks:
+            block.removeNode()
+
+    def delBLockFrom(self, position):
+        x, y, z = self.findHighestEmpty(position)
+        pos = z, y, z -1
+        for block in self.findBlocks(pos):
+            block.removeNode()
+
+    def saveMap(self):
+        blocks = self.land.getChildren()
+        with open('my_map.dat', 'wb') as fout:
+            pickle.dump(len(blocks), fout)
             for block in blocks:
-                block.removeNode()
+                x, y, z = block.getPos()
 
-        def delBLockFrom(self, position):
-            x, y, z = self.findHighestEmpty(position)
-            pos = z, y, z -1
-            for block in self.findBlocks(pos):
-                block.removeNode()
+    def loadMap(self):
+        self.clear()
+        with open('my_map.dat', 'rb') as fin:
+            length = pickle.load(fin)
+            for me in range(length):
+                pos = pickle.load(fin)
+                self.addBlock(pos)
