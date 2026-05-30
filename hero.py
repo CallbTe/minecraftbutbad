@@ -45,10 +45,12 @@ class Hero():
         base.accept('a', self.left)
         base.accept('a' + '-repeat', self.left)
         base.accept('b', self.build)
-        base.accept('x', self.destroy)
+        base.accept('v', self.destroy)
         base.accept('q', self.up)
         base.accept('e', self.down)
         base.accept('z', self.change_mode)
+        base.accept('k', self.land.saveMap)
+        base.accept('l', self.land.loadMap)
     def check_dir(self, angle):
         if angle >= 0 and angle <= 20:
             return 0, -1
